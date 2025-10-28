@@ -76,4 +76,6 @@ router.get("/client/:id/balance", async (req, res) => {
 });
 
 
+router.post("/:id/topup", topupClient);
+
 module.exports = router;

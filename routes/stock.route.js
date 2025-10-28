@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("./db");
+const { getSoldStock } = require("../controllers/stockController");
 
 // GET /stock/available
 router.get("/stock/available", async (req, res) => {
@@ -24,5 +25,7 @@ router.get("/stock/available", async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+router.get("/sold", getSoldStock);
 
+router.post("/batch", insertStockBatch);
 module.exports = router;

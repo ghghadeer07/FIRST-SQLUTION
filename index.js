@@ -6,6 +6,7 @@ const db = require("./db");
 const plansRoutes = require("./routes/plan.route");
 const clientsRoutes = require("./routes/client.route");
 const stockRoutes = require("./routes/stock.route");
+const invoiceRoutes = require("./routes/invoice.route");
 app.use(express.json());
 
 app.get("/", async (req, res) => {
@@ -15,6 +16,7 @@ app.get("/", async (req, res) => {
 app.use("/plans", plansRoutes);
 app.use("/client", clientsRoutes);
 app.use("/stock", stockRoutes);
+app.use("/invoice",invoiceRoutes)
 app.listen(PORT, () => {
   console.log("http://localhost:3000");
 });

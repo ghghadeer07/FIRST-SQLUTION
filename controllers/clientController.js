@@ -45,7 +45,51 @@ const login = async (phone, password) => {
   return { success: true, token: token };
 };
 
+
+
+// POST /client/:id/topup
+async function topupClient(req, res) {
+  const { id } = req.params;
+  const { amount } = req.body;
+
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ error: "Invalid amount" });
+  }
+
+  try {
+    // احضار الرصيد القديم
+    const oldBalanceQuery = await db.query(
+      "SELECT wallet_balance FROM clients WHERE id = $1",
+      [id]
+    );
+
+    if (oldBalanceQuery.rowCount === 0) {
+      return res.status(404).json({ error: "Client not found" });
+    }
+
+    const oldBalance = Number(oldBalanceQuery.rows[0].wallet_balance);
+
+    // تحديث الرصيد
+    const newBalance = oldBalance + Number(amount);
+    await db.query(
+      "UPDATE clients SET wallet_balance = $1 WHERE id = $2",
+      [newBalance, id]
+    );
+
+    // إعادة النتيجة
+    res.json({
+      id,
+      oldBalance,
+      newBalance,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 module.exports = {
   register,
   login,
+  topupClient,
 };

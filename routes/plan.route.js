@@ -37,4 +37,6 @@ router.post("/purchase", clientAuth, async (req, res) => {
   }
 });
 
+router.get("/", getPlans);
+router.get("/:id/stock", getPlanStock);
 module.exports = router;

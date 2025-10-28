@@ -54,6 +54,47 @@ const purchase = async (planId, clientId) => {
   return { success: true, code: stock.code, newInvoice };
 };
 
+
+// GET /plans/:id/stock
+async function getPlanStock(req, res) {
+  const { id } = req.params;
+
+  try {
+    const result = await db.query(
+      `
+      SELECT
+        plans.id AS plan_id,
+        plans.name AS plan_name,
+        COUNT(*) FILTER (WHERE stock.status = 'ready') AS ready,
+        COUNT(*) FILTER (WHERE stock.status = 'sold') AS sold,
+        COUNT(*) FILTER (WHERE stock.status = 'error') AS error
+      FROM plans
+      LEFT JOIN stock ON plans.id = stock.plan_id
+      WHERE plans.id = $1
+      GROUP BY plans.id;
+      `,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Plan not found" });
+    }
+
+    const row = result.rows[0];
+    res.json({
+      planId: row.plan_id,
+      planName: row.plan_name,
+      ready: Number(row.ready),
+      sold: Number(row.sold),
+      error: Number(row.error),
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 module.exports = {
   getPlans,
   getPlanById,
